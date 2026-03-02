@@ -1,0 +1,376 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ club.name }} — PC Club{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 60px 40px;
+    }
+
+    /* Шапка клуба */
+    .club-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: start;
+        margin-bottom: 80px;
+        animation: fadeUp 0.5s ease forwards;
+    }
+
+    .club-header-info .label {
+        display: block;
+        margin-bottom: 16px;
+    }
+
+    .club-header-info h1 {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: clamp(36px, 5vw, 60px);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: -1px;
+        line-height: 1;
+        margin-bottom: 16px;
+    }
+
+    .club-header-info .address {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 13px;
+        color: var(--text-dim);
+        letter-spacing: 1px;
+        margin-bottom: 24px;
+    }
+
+    .club-header-info .description {
+        font-size: 15px;
+        color: var(--text-dim);
+        line-height: 1.8;
+        margin-bottom: 32px;
+    }
+
+    /* Галерея фото клуба */
+    .club-gallery {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .club-gallery img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        filter: brightness(0.8) saturate(0.8);
+        transition: filter 0.3s;
+    }
+
+    .club-gallery img:first-child {
+        grid-column: 1 / -1;
+        height: 260px;
+    }
+
+    .club-gallery img:hover {
+        filter: brightness(1) saturate(1);
+    }
+
+    /* Блок зон */
+    .section-title {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+        font-size: 14px;
+        color: var(--text-dim);
+        margin-bottom: 40px;
+    }
+
+    .zones-list {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* Карточка зоны */
+    .zone-card {
+        background: var(--dark-2);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        animation: fadeUp 0.5s ease forwards;
+        animation-delay: calc(var(--i) * 0.1s);
+        opacity: 0;
+        transition: border-color 0.3s;
+    }
+
+    .zone-card:hover {
+        border-color: rgba(26, 86, 255, 0.5);
+    }
+
+    .zone-card-inner {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+    }
+
+    /* Галерея зоны */
+    .zone-images {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .zone-images img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.75) saturate(0.8);
+        transition: filter 0.3s, transform 0.4s;
+        min-height: 200px;
+    }
+
+    .zone-card:hover .zone-images img {
+        filter: brightness(0.9) saturate(1);
+        transform: scale(1.04);
+    }
+
+    .zone-images-placeholder {
+        width: 100%;
+        height: 100%;
+        min-height: 200px;
+        background: var(--dark-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+        color: var(--text-dim);
+        letter-spacing: 2px;
+    }
+
+    /* Контент зоны */
+    .zone-content {
+        padding: 28px 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .zone-top {
+        margin-bottom: 20px;
+    }
+
+    .zone-name-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .zone-name {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .zone-desc {
+        font-size: 14px;
+        color: var(--text-dim);
+        line-height: 1.7;
+    }
+
+    /* Тарифы */
+    .tariffs-label {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--blue-light);
+        margin-bottom: 12px;
+    }
+
+    .tariffs-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .tariff-item {
+        background: var(--dark-3);
+        border: 1px solid var(--border);
+        padding: 8px 16px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12px;
+        color: var(--text);
+        letter-spacing: 0.5px;
+    }
+
+    .tariff-item span {
+        color: var(--blue-light);
+        margin-left: 8px;
+    }
+
+    /* Кнопка выбора места */
+    .zone-action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+    }
+
+    .seats-count {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12px;
+        color: var(--text-dim);
+        letter-spacing: 1px;
+    }
+
+    /* Кнопка назад */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        text-decoration: none;
+        margin-bottom: 48px;
+        transition: color 0.2s;
+    }
+
+    .back-link:hover {
+        color: var(--blue-light);
+    }
+
+    @media (max-width: 768px) {
+        .club-header {
+            grid-template-columns: 1fr;
+        }
+
+        .zone-card-inner {
+            grid-template-columns: 1fr;
+        }
+
+        .zone-images img {
+            height: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-wrap">
+
+    <a href="{% url 'club:index' %}" class="back-link">← Все клубы</a>
+
+    {# Шапка клуба #}
+    <div class="club-header">
+        <div class="club-header-info">
+            <span class="label">// {{ club.zones.count }} игровых зон</span>
+            <h1>{{ club.name }}</h1>
+            <div class="address">📍 {{ club.address }}</div>
+            <div class="description">{{ club.description }}</div>
+            <a href="#zones" class="btn btn-primary">Выбрать место</a>
+        </div>
+
+        {# Галерея фотографий клуба #}
+        {% with images=club.club_images.all %}
+            {% if images %}
+                <div class="club-gallery">
+                    {% for img in images %}
+                        <img src="{{ img.image.url }}" alt="{{ club.name }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="divider"></div>
+
+    {# Список зон #}
+    <div id="zones">
+        <div>
+            <div class="section-title">Игровые зоны</div>
+            <div class="section-subtitle">Выбери зону и забронируй место</div>
+        </div>
+
+        <div class="zones-list">
+            {% for zone in club.zones.all %}
+                <div class="zone-card" style="--i: {{ forloop.counter }}">
+                    <div class="zone-card-inner">
+
+                        {# Фото зоны #}
+                        <div class="zone-images">
+                            {% with zone.zone_images.first as img %}
+                                {% if img %}
+                                    <img src="{{ img.image.url }}" alt="{{ zone.name }}">
+                                {% else %}
+                                    <div class="zone-images-placeholder">NO IMAGE</div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        {# Контент зоны #}
+                        <div class="zone-content">
+                            <div class="zone-top">
+                                <div class="zone-name-row">
+                                    <div class="zone-name">{{ zone.name }}</div>
+                                    <span class="badge badge-{{ zone.zone_type }}">
+                                        {{ zone.get_zone_type_display }}
+                                    </span>
+                                </div>
+                                <div class="zone-desc">{{ zone.description }}</div>
+                            </div>
+
+                            {# Тарифы #}
+                            {% if zone.tariffs.all %}
+                                <div>
+                                    <div class="tariffs-label">// тарифы</div>
+                                    <div class="tariffs-list">
+                                        {% for tariff in zone.tariffs.all %}
+                                            <div class="tariff-item">
+                                                {{ tariff.name }}
+                                                <span>{{ tariff.price_per_hour }}₽/ч</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {# Кнопка выбора места #}
+                            <div class="zone-action">
+                                <span class="seats-count">
+                                    {{ zone.seats.count }} мест
+                                </span>
+                                {# Сюда потом добавим ссылку на выбор места #}
+                                <a href="{% url 'club:select_seat' club.slug zone.pk %}"
+                                   hx-get="{% url 'club:select_seat' club.slug zone.pk %}"
+                                   hx-target="#content"
+                                   hx-push-url="true"
+                                   class="btn btn-outline">
+                                    Выбрать место →
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div style="color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 2px;">
+                    // ЗОН НЕ НАЙДЕНО
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

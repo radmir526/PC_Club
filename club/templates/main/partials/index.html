@@ -1,0 +1,55 @@
+<div class="index-wrap">
+
+    <div class="index-header">
+        <span class="label">// Выбери локацию</span>
+        <h1>Наши <span>клубы</span></h1>
+        <p>Выбери клуб рядом с тобой и забронируй место прямо сейчас</p>
+    </div>
+
+    {% if clubs %}
+        <div class="clubs-grid">
+            {% for club in clubs %}
+                <a href="{% url 'club:club_detail' club.slug %}"
+                   hx-get="{% url 'club:club_detail' club.slug %}"
+                   hx-target="#content"
+                   hx-push-url="true"
+                   class="club-card"
+                   style="--i: {{ forloop.counter }}">
+
+                    {# Показываем первую фотографию клуба если она есть #}
+                    {% with club.club_images.first as img %}
+                        {% if img %}
+                            <div style="overflow:hidden;">
+                                <img src="{{ img.image.url }}" 
+                                     alt="{{ club.name }}" 
+                                     class="club-card-image">
+                            </div>
+                        {% else %}
+                            <div class="club-card-image-placeholder">
+                                NO IMAGE
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="club-card-body">
+                        <div class="club-card-name">{{ club.name }}</div>
+                        <div class="club-card-address">📍 {{ club.address }}</div>
+                        <div class="club-card-desc">{{ club.description }}</div>
+                        <div class="club-card-footer">
+                            <span class="club-card-zones">
+                                {{ club.zones.count }} зон
+                            </span>
+                            <span class="arrow">→</span>
+                        </div>
+                    </div>
+
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            // КЛУБЫ НЕ НАЙДЕНЫ
+        </div>
+    {% endif %}
+
+</div>

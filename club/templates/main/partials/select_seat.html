@@ -1,0 +1,81 @@
+<div class="seat-wrap">
+
+    <a href="{% url 'club:club_detail' zone.club.slug %}" 
+       hx-get="{% url 'club:club_detail' zone.club.slug %}"
+       hx-target="#content"
+       hx-push-url="true"    
+       class="back-link">← Назад к клубу</a>
+
+    {# Шапка зоны #}
+    <div class="zone-header">
+        <div class="zone-header-left">
+            <span class="label">// Выбери место</span>
+            <h1>{{ zone.name }}</h1>
+            <span class="badge badge-{{ zone.zone_type }}">{{ zone.get_zone_type_display }}</span>
+            <p class="zone-desc" style="margin-top: 12px;">{{ zone.description }}</p>
+        </div>
+
+        {# Фотографии зоны #}
+        {% with images=zone.zone_images.all %}
+            {% if images %}
+                <div class="zone-gallery">
+                    {% for img in images %}
+                        <img src="{{ img.image.url }}" alt="{{ zone.name }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+        {# Тарифы #}
+        {% if zone.tariffs.all %}
+        <div class="zone-tariffs">
+            <div class="tariffs-label">// тарифы</div>
+            {% for tariff in zone.tariffs.all %}
+                <div class="tariff-item">
+                    <span class="tariff-hours">{{ tariff.duration_hours }} ч</span>
+                    <span class="tariff-price">{{ tariff.price_per_hour }}₽</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    </div>
+
+    <div class="divider"></div>
+
+    {# Легенда #}
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-dot free"></div>
+            Свободно
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot inactive"></div>
+            Недоступно
+        </div>
+    </div>
+
+    {# Экран — просто декорация #}
+    <div class="screen">
+        <div class="screen-line"></div>
+        <div class="screen-label">МОНИТОРЫ</div>
+    </div>
+
+    {# Схема мест, сгруппированная по рядам #}
+    <div class="seats-layout">
+        {% regroup zone.seats.all by row as rows %}
+        {% for row in rows %}
+            <div class="seat-column">
+                <div class="row-label">R{{ row.grouper }}</div>
+                {% for seat in row.list %}
+                    {% if seat.is_active %}
+                        <a href="#" class="seat free">{{ seat.number }}</a>
+                    {% else %}
+                        <div class="seat inactive">{{ seat.number }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+</div>

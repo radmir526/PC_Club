@@ -1,0 +1,109 @@
+<div class="detail-wrap">
+
+    <a href="{% url 'club:index' %}" 
+    hx-get="{% url 'club:index' %}"
+    hx-target="#content"
+    hx-push-url="true"
+    class="back-link">← Все клубы</a>
+
+    {# Шапка клуба #}
+    <div class="club-header">
+        <div class="club-header-info">
+            <span class="label">// {{ club.zones.count }} игровых зон</span>
+            <h1>{{ club.name }}</h1>
+            <div class="address">📍 {{ club.address }}</div>
+            <div class="description">{{ club.description }}</div>
+            <a href="#zones" class="btn btn-primary">Выбрать место</a>
+        </div>
+
+        {# Галерея фотографий клуба #}
+        {% with images=club.club_images.all %}
+            {% if images %}
+                <div class="club-gallery">
+                    {% for img in images %}
+                        <img src="{{ img.image.url }}" alt="{{ club.name }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="divider"></div>
+
+    {# Список зон #}
+    <div id="zones">
+        <div>
+            <div class="section-title">Игровые зоны</div>
+            <div class="section-subtitle">Выбери зону и забронируй место</div>
+        </div>
+
+        <div class="zones-list">
+            {% for zone in club.zones.all %}
+                <div class="zone-card" style="--i: {{ forloop.counter }}">
+                    <div class="zone-card-inner">
+
+                        {# Фото зоны #}
+                        <div class="zone-images">
+                            {% with zone.zone_images.first as img %}
+                                {% if img %}
+                                    <img src="{{ img.image.url }}" alt="{{ zone.name }}">
+                                {% else %}
+                                    <div class="zone-images-placeholder">NO IMAGE</div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        {# Контент зоны #}
+                        <div class="zone-content">
+                            <div class="zone-top">
+                                <div class="zone-name-row">
+                                    <div class="zone-name">{{ zone.name }}</div>
+                                    <span class="badge badge-{{ zone.zone_type }}">
+                                        {{ zone.get_zone_type_display }}
+                                    </span>
+                                </div>
+                                <div class="zone-desc">{{ zone.description }}</div>
+                            </div>
+
+                            {# Тарифы #}
+                            {% if zone.tariffs.all %}
+                                <div>
+                                    <div class="tariffs-label">// тарифы</div>
+                                    <div class="tariffs-list">
+                                        {% for tariff in zone.tariffs.all %}
+                                            <div class="tariff-item">
+                                                <span class="tariff-hours">{{ tariff.duration_hours }} ч</span>
+                                                <span class="tariff-price">{{ tariff.price_per_hour }}₽</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {# Кнопка выбора места #}
+                            <div class="zone-action">
+                                <span class="seats-count">
+                                    {{ zone.seats.count }} мест
+                                </span>
+                                {# Сюда потом добавим ссылку на выбор места #}
+                                <a href="{% url 'club:select_seat' club.slug zone.pk %}"
+                                   hx-get="{% url 'club:select_seat' club.slug zone.pk %}"
+                                   hx-target="#content"
+                                   hx-push-url="true"
+                                   class="btn btn-outline">
+                                    Выбрать место →
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div style="color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 2px;">
+                    // ЗОН НЕ НАЙДЕНО
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
