@@ -6,7 +6,12 @@
     <title>{% block title %}PC Club{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
+
+        /* =====================
+           СБРОС И ПЕРЕМЕННЫЕ
+        ===================== */
         *, *::before, *::after {
             margin: 0;
             padding: 0;
@@ -27,9 +32,10 @@
             --border: rgba(26, 86, 255, 0.2);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        /* =====================
+           БАЗОВЫЕ СТИЛИ
+        ===================== */
+        html { scroll-behavior: smooth; }
 
         body {
             background-color: var(--black);
@@ -45,7 +51,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(26, 86, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(26, 86, 255, 0.03) 1px, transparent 1px);
             background-size: 60px 60px;
@@ -67,7 +73,15 @@
             z-index: 0;
         }
 
-        /* Шапка */
+        /* Анимация появления */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =====================
+           ШАПКА
+        ===================== */
         header {
             position: sticky;
             top: 0;
@@ -92,9 +106,7 @@
             text-decoration: none;
         }
 
-        .logo span {
-            color: var(--blue);
-        }
+        .logo span { color: var(--blue); }
 
         nav a {
             font-family: 'Rajdhani', sans-serif;
@@ -108,16 +120,35 @@
             transition: color 0.2s;
         }
 
-        nav a:hover {
-            color: var(--blue-light);
-        }
+        nav a:hover { color: var(--blue-light); }
 
-        /* Основной контент */
+        /* =====================
+           ОСНОВНОЙ КОНТЕНТ
+        ===================== */
         main {
             position: relative;
             z-index: 1;
             min-height: calc(100vh - 64px);
         }
+
+        /* =====================
+           ФУТЕР
+        ===================== */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 32px;
+            border-top: 1px solid var(--border);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        /* =====================
+           ПЕРЕИСПОЛЬЗУЕМЫЕ КОМПОНЕНТЫ
+        ===================== */
 
         /* Кнопки */
         .btn {
@@ -159,19 +190,7 @@
             box-shadow: 0 0 16px var(--blue-glow);
         }
 
-        /* Карточки */
-        .card {
-            background: var(--dark-2);
-            border: 1px solid var(--border);
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .card:hover {
-            border-color: rgba(26, 86, 255, 0.5);
-            box-shadow: 0 0 30px rgba(26, 86, 255, 0.1);
-        }
-
-        /* Бейдж типа зоны */
+        /* Бейджи */
         .badge {
             display: inline-block;
             padding: 3px 10px;
@@ -192,7 +211,7 @@
             margin: 40px 0;
         }
 
-        /* Подписи / метки */
+        /* Метка */
         .label {
             font-family: 'Share Tech Mono', monospace;
             font-size: 11px;
@@ -201,724 +220,490 @@
             color: var(--blue-light);
         }
 
-        /* Анимация появления */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Кнопка назад */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-bottom: 48px;
+            transition: color 0.2s;
         }
 
-        .fade-up {
+        .back-link:hover { color: var(--blue-light); }
+
+        /* =====================
+           ГЛАВНАЯ СТРАНИЦА
+        ===================== */
+        .index-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .index-header {
+            margin-bottom: 64px;
             animation: fadeUp 0.5s ease forwards;
         }
 
-        /* Футер */
-        footer {
+        .index-header .label { display: block; margin-bottom: 16px; }
+
+        .index-header h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(40px, 6vw, 72px);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .index-header h1 span { color: var(--blue); }
+
+        .index-header p {
+            margin-top: 20px;
+            font-size: 16px;
+            color: var(--text-dim);
+            max-width: 400px;
+            line-height: 1.7;
+        }
+
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .club-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
             position: relative;
-            z-index: 1;
-            text-align: center;
-            padding: 32px;
-            border-top: 1px solid var(--border);
+            overflow: hidden;
+            animation: fadeUp 0.5s ease forwards;
+            animation-delay: calc(var(--i) * 0.1s);
+            opacity: 0;
+        }
+
+        .club-card-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            filter: brightness(0.7) saturate(0.8);
+            transition: filter 0.4s, transform 0.4s;
+        }
+
+        .club-card-image-placeholder {
+            width: 100%;
+            height: 220px;
+            background: var(--dark-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .club-card:hover .club-card-image { filter: brightness(0.9) saturate(1); transform: scale(1.03); }
+
+        .club-card-body {
+            padding: 24px;
+            background: var(--dark-2);
+            border: 1px solid var(--border);
+            border-top: none;
+            transition: border-color 0.3s;
+        }
+
+        .club-card:hover .club-card-body { border-color: rgba(26, 86, 255, 0.5); }
+
+        .club-card-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .club-card-address {
             font-family: 'Share Tech Mono', monospace;
             font-size: 12px;
             color: var(--text-dim);
             letter-spacing: 1px;
+            margin-bottom: 16px;
         }
 
+        .club-card-desc {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.7;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .club-card-footer {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .club-card-zones {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--blue-light);
+            letter-spacing: 1px;
+        }
+
+        .arrow { color: var(--blue); font-size: 20px; transition: transform 0.2s; }
+        .club-card:hover .arrow { transform: translateX(6px); }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--text-dim);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        /* =====================
+           СТРАНИЦА КЛУБА
+        ===================== */
         .detail-wrap {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 60px 40px;
-    }
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
 
-    /*club_detail*/
-    /* Шапка клуба */
-    .club-header {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 60px;
-        align-items: start;
-        margin-bottom: 80px;
-        animation: fadeUp 0.5s ease forwards;
-    }
-
-    .club-header-info .label {
-        display: block;
-        margin-bottom: 16px;
-    }
-
-    .club-header-info h1 {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: clamp(36px, 5vw, 60px);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: -1px;
-        line-height: 1;
-        margin-bottom: 16px;
-    }
-
-    .club-header-info .address {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 13px;
-        color: var(--text-dim);
-        letter-spacing: 1px;
-        margin-bottom: 24px;
-    }
-
-    .club-header-info .description {
-        font-size: 15px;
-        color: var(--text-dim);
-        line-height: 1.8;
-        margin-bottom: 32px;
-    }
-
-    /* Галерея фото клуба */
-    .club-gallery {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
-    .club-gallery img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        filter: brightness(0.8) saturate(0.8);
-        transition: filter 0.3s;
-    }
-
-    .club-gallery img:first-child {
-        grid-column: 1 / -1;
-        height: 260px;
-    }
-
-    .club-gallery img:hover {
-        filter: brightness(1) saturate(1);
-    }
-
-    /* Блок зон */
-    .section-title {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 32px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
-    }
-
-    .section-subtitle {
-        font-size: 14px;
-        color: var(--text-dim);
-        margin-bottom: 40px;
-    }
-
-    .zones-list {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-    }
-
-    /* Карточка зоны */
-    .zone-card {
-        background: var(--dark-2);
-        border: 1px solid var(--border);
-        overflow: hidden;
-        animation: fadeUp 0.5s ease forwards;
-        animation-delay: calc(var(--i) * 0.1s);
-        opacity: 0;
-        transition: border-color 0.3s;
-    }
-
-    .zone-card:hover {
-        border-color: rgba(26, 86, 255, 0.5);
-    }
-
-    .zone-card-inner {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-    }
-
-    /* Галерея зоны */
-    .zone-images {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .zone-images img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        filter: brightness(0.75) saturate(0.8);
-        transition: filter 0.3s, transform 0.4s;
-        min-height: 200px;
-    }
-
-    .zone-card:hover .zone-images img {
-        filter: brightness(0.9) saturate(1);
-        transform: scale(1.04);
-    }
-
-    .zone-images-placeholder {
-        width: 100%;
-        height: 100%;
-        min-height: 200px;
-        background: var(--dark-3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
-        color: var(--text-dim);
-        letter-spacing: 2px;
-    }
-
-    /* Контент зоны */
-    .zone-content {
-        padding: 28px 32px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    .zone-top {
-        margin-bottom: 20px;
-    }
-
-    .zone-name-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 10px;
-    }
-
-    .zone-name {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 22px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .zone-desc {
-        font-size: 14px;
-        color: var(--text-dim);
-        line-height: 1.7;
-    }
-
-    /* Тарифы */
-    .tariffs-label {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--blue-light);
-        margin-bottom: 12px;
-    }
-
-    .tariffs-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 20px;
-    }
-
-    .tariff-item {
-        background: var(--dark-3);
-        border: 1px solid var(--border);
-        padding: 8px 16px;
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12px;
-        color: var(--text);
-        letter-spacing: 0.5px;
-    }
-
-    .tariff-item span {
-        color: var(--blue-light);
-        margin-left: 8px;
-    }
-
-    /* Кнопка выбора места */
-    .zone-action {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-    }
-
-    .seats-count {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12px;
-        color: var(--text-dim);
-        letter-spacing: 1px;
-    }
-
-    /* Кнопка назад */
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--text-dim);
-        text-decoration: none;
-        margin-bottom: 48px;
-        transition: color 0.2s;
-    }
-
-    .back-link:hover {
-        color: var(--blue-light);
-    }
-
-    @media (max-width: 768px) {
         .club-header {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+            margin-bottom: 80px;
+            animation: fadeUp 0.5s ease forwards;
         }
 
-        .zone-card-inner {
-            grid-template-columns: 1fr;
+        .club-header-info .label { display: block; margin-bottom: 16px; }
+
+        .club-header-info h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(36px, 5vw, 60px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 16px;
         }
 
-        .zone-images img {
-            height: 200px;
+        .club-header-info .address {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            margin-bottom: 24px;
         }
-    }
 
-    /*select_seat*/
-    .seat-wrap {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 60px 40px;
-    }
+        .club-header-info .description {
+            font-size: 15px;
+            color: var(--text-dim);
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
 
-    /* Кнопка назад */
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--text-dim);
-        text-decoration: none;
-        margin-bottom: 48px;
-        transition: color 0.2s;
-    }
+        .club-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .club-gallery img { width: 100%; height: 180px; object-fit: cover; filter: brightness(0.8) saturate(0.8); transition: filter 0.3s; }
+        .club-gallery img:first-child { grid-column: 1 / -1; height: 260px; }
+        .club-gallery img:hover { filter: brightness(1) saturate(1); }
 
-    .back-link:hover {
-        color: var(--blue-light);
-    }
+        .section-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
 
-    /* Шапка зоны */
-    .zone-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 48px;
-        animation: fadeUp 0.5s ease forwards;
-    }
+        .section-subtitle { font-size: 14px; color: var(--text-dim); margin-bottom: 40px; }
 
-    .zone-header-left .label {
-        display: block;
-        margin-bottom: 12px;
-    }
+        .zones-list { display: flex; flex-direction: column; gap: 24px; }
 
-    .zone-header-left h1 {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: clamp(32px, 5vw, 52px);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: -1px;
-        line-height: 1;
-        margin-bottom: 12px;
-    }
+        .zone-card {
+            background: var(--dark-2);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            animation: fadeUp 0.5s ease forwards;
+            animation-delay: calc(var(--i) * 0.1s);
+            opacity: 0;
+            transition: border-color 0.3s;
+        }
 
-    .zone-header-left .zone-desc {
-        font-size: 14px;
-        color: var(--text-dim);
-        line-height: 1.7;
-        max-width: 400px;
-    }
+        .zone-card:hover { border-color: rgba(26, 86, 255, 0.5); }
+        .zone-card-inner { display: grid; grid-template-columns: 280px 1fr; }
 
-    /* Тарифы в шапке */
-    .zone-tariffs {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-end;
-    }
+        .zone-images { position: relative; overflow: hidden; }
+        .zone-images img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.75) saturate(0.8); transition: filter 0.3s, transform 0.4s; min-height: 200px; }
+        .zone-card:hover .zone-images img { filter: brightness(0.9) saturate(1); transform: scale(1.04); }
 
-    .zone-tariffs .tariffs-label {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--blue-light);
-        margin-bottom: 4px;
-        text-align: right;
-    }
+        .zone-images-placeholder {
+            width: 100%;
+            height: 100%;
+            min-height: 200px;
+            background: var(--dark-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
 
-    .tariff-item {
-        background: var(--dark-2);
-        border: 1px solid var(--border);
-        padding: 10px 20px;
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 13px;
-        color: var(--text);
-        letter-spacing: 0.5px;
-        text-align: right;
-    }
+        .zone-content { padding: 28px 32px; display: flex; flex-direction: column; justify-content: space-between; }
+        .zone-top { margin-bottom: 20px; }
+        .zone-name-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 
-    .tariff-item span {
-        color: var(--blue-light);
-        margin-left: 12px;
-    }
+        .zone-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    .divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--blue), transparent);
-        margin: 40px 0;
-    }
+        .zone-desc { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+        .zone-action { display: flex; align-items: center; justify-content: space-between; padding-top: 20px; border-top: 1px solid var(--border); }
+        .seats-count { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 1px; }
 
-    /* Легенда */
-    .legend {
-        display: flex;
-        align-items: center;
-        gap: 24px;
-        margin-bottom: 40px;
-        animation: fadeUp 0.5s ease forwards;
-        animation-delay: 0.1s;
-        opacity: 0;
-        justify-content: center;
-    }
+        /* =====================
+           ТАРИФЫ
+        ===================== */
+        .tariffs-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--blue-light);
+            margin-bottom: 12px;
+        }
 
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12px;
-        letter-spacing: 1px;
-        color: var(--text-dim);
-    }
+        .tariffs-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 
-    .legend-dot {
-        width: 20px;
-        height: 20px;
-        border: 1px solid;
-    }
+        .tariff-item {
+            background: var(--dark-3);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: var(--text);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-    .legend-dot.free { background: var(--dark-3); border-color: var(--border); }
-    .legend-dot.inactive { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); }
+        .tariff-hours { color: var(--text-dim); }
+        .tariff-price { color: var(--blue-light); }
 
-    /* Экран — декоративный элемент */
-    .screen {
-        width: 60%;
-        margin: 0 auto 48px;
-        text-align: center;
-        animation: fadeUp 0.5s ease forwards;
-        animation-delay: 0.15s;
-        opacity: 0;
-    }
+        /* =====================
+           СТРАНИЦА ВЫБОРА МЕСТА
+        ===================== */
+        .seat-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
 
-    .screen-line {
-        height: 3px;
-        background: linear-gradient(90deg, transparent, var(--blue-light), transparent);
-        margin-bottom: 8px;
-    }
+        .zone-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 48px; animation: fadeUp 0.5s ease forwards; }
+        .zone-header-left .label { display: block; margin-bottom: 12px; }
 
-    .screen-label {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 3px;
-        color: var(--text-dim);
-    }
+        .zone-header-left h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
 
-    /* Схема мест */
-    .seats-layout {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 60px;
-    align-items: flex-start;
-    }
+        .zone-header-left .zone-desc { font-size: 14px; color: var(--text-dim); line-height: 1.7; max-width: 400px; }
 
-    .seat-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+        .zone-tariffs { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+        .zone-tariffs .tariffs-label { text-align: right; margin-bottom: 4px; }
+        .zone-tariffs .tariff-item { text-align: right; padding: 10px 20px; background: var(--dark-2); }
 
-    .row-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-    }
+        .zone-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 400px; }
+        .zone-gallery img { width: 100%; height: 150px; object-fit: cover; filter: brightness(0.8) saturate(0.8); transition: filter 0.3s; }
+        .zone-gallery img:first-child { grid-column: 1 / -1; height: 200px; }
+        .zone-gallery img:hover { filter: brightness(1) saturate(1); }
 
-    .seats {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
+        .legend { display: flex; align-items: center; gap: 24px; margin-bottom: 40px; animation: fadeUp 0.5s ease forwards; animation-delay: 0.1s; opacity: 0; justify-content: center; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 1px; color: var(--text-dim); }
+        .legend-dot { width: 20px; height: 20px; border: 1px solid; }
+        .legend-dot.free { background: var(--dark-3); border-color: var(--border); }
+        .legend-dot.inactive { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); }
 
-    .seat-column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    }
+        .screen { width: 60%; margin: 0 auto 48px; text-align: center; animation: fadeUp 0.5s ease forwards; animation-delay: 0.15s; opacity: 0; }
+        .screen-line { height: 3px; background: linear-gradient(90deg, transparent, var(--blue-light), transparent); margin-bottom: 8px; }
+        .screen-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 3px; color: var(--text-dim); }
 
-    /* Само место */
-    .seat {
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12px;
-        letter-spacing: 0.5px;
-        cursor: pointer;
-        border: 1px solid;
-        transition: all 0.2s;
-        text-decoration: none;
-        position: relative;
-    }
+        .seats-layout { display: flex; flex-direction: row; justify-content: center; gap: 60px; align-items: flex-start; }
+        .seat-column { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .row-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 4px; }
 
-    /* Свободное место */
-    .seat.free {
-        background: var(--dark-3);
-        border-color: var(--border);
-        color: var(--text-dim);
-    }
+        .seat {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
 
-    .seat.free:hover {
-        background: var(--blue-dim);
-        border-color: var(--blue);
-        color: var(--text);
-        box-shadow: 0 0 16px var(--blue-glow);
-        transform: translateY(-2px);
-    }
+        .seat.free { background: var(--dark-3); border-color: var(--border); color: var(--text-dim); }
+        .seat.free:hover { background: var(--blue-dim); border-color: var(--blue); color: var(--text); box-shadow: 0 0 16px var(--blue-glow); transform: translateY(-2px); }
+        .seat.inactive { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.25); color: rgba(239, 68, 68, 0.4); cursor: not-allowed; }
 
-    /* Недоступное место */
-    .seat.inactive {
-        background: rgba(239, 68, 68, 0.08);
-        border-color: rgba(239, 68, 68, 0.25);
-        color: rgba(239, 68, 68, 0.4);
-        cursor: not-allowed;
-    }
+        .seats-with-monitor {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            justify-content: center;
+        }
 
-    /*index.html*/
-    .index-wrap {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 80px 40px;
-    }
+        .monitor-side {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding-top: 8px;
+        }
 
-    .index-header {
-        margin-bottom: 64px;
-        animation: fadeUp 0.5s ease forwards;
-    }
+        .monitor-line {
+            width: 3px;
+            flex: 1;
+            min-height: 60px;
+            background: linear-gradient(180deg, transparent, var(--blue-light), transparent);
+        }
 
-    .index-header .label {
-        display: block;
-        margin-bottom: 16px;
-    }
+        .monitor-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--text-dim);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
 
-    .index-header h1 {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: clamp(40px, 6vw, 72px);
-        font-weight: 700;
-        line-height: 1;
-        letter-spacing: -1px;
-        text-transform: uppercase;
-    }
+        /* =====================
+           АВТОРИЗАЦИЯ
+        ===================== */
+        .auth-wrap { min-height: calc(100vh - 64px); display: flex; align-items: center; justify-content: center; padding: 40px; }
 
-    .index-header h1 span {
-        color: var(--blue);
-    }
+        .auth-box {
+            width: 100%;
+            max-width: 440px;
+            background: var(--dark-2);
+            border: 1px solid var(--border);
+            padding: 48px;
+        }
 
-    .index-header p {
-        margin-top: 20px;
-        font-size: 16px;
-        color: var(--text-dim);
-        max-width: 400px;
-        line-height: 1.7;
-    }
+        .auth-header { margin-bottom: 40px; }
 
-    /* Сетка клубов */
-    .clubs-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 24px;
-    }
+        .auth-header h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 40px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin: 12px 0 8px;
+        }
 
-    .club-card {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-        position: relative;
-        overflow: hidden;
-        animation: fadeUp 0.5s ease forwards;
-        animation-delay: calc(var(--i) * 0.1s);
-        opacity: 0;
-    }
+        .auth-header p { font-size: 14px; color: var(--text-dim); }
+        .auth-header p a { color: var(--blue-light); text-decoration: none; }
 
-    .club-card-image {
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-        display: block;
-        filter: brightness(0.7) saturate(0.8);
-        transition: filter 0.4s, transform 0.4s;
-    }
+        .auth-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
 
-    /* Если нет картинки — заглушка */
-    .club-card-image-placeholder {
-        width: 100%;
-        height: 220px;
-        background: var(--dark-3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12px;
-        color: var(--text-dim);
-        letter-spacing: 2px;
-        border-bottom: 1px solid var(--border);
-    }
+        .form-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--blue-light);
+        }
 
-    .club-card:hover .club-card-image {
-        filter: brightness(0.9) saturate(1);
-        transform: scale(1.03);
-    }
+        .form-input {
+            background: var(--dark-3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 16px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
 
-    .club-card-body {
-        padding: 24px;
-        background: var(--dark-2);
-        border: 1px solid var(--border);
-        border-top: none;
-        transition: border-color 0.3s;
-    }
+        .form-input:focus { border-color: var(--blue); }
+        .form-input::placeholder { color: var(--text-dim); }
+        .form-errors, .field-error { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #ef4444; letter-spacing: 1px; }
 
-    .club-card:hover .club-card-body {
-        border-color: rgba(26, 86, 255, 0.5);
-    }
+        /* =====================
+           ПРОФИЛЬ
+        ===================== */
+        .profile-wrap { max-width: 1000px; margin: 0 auto; padding: 60px 40px; }
+        .profile-header { margin-bottom: 40px; animation: fadeUp 0.5s ease forwards; }
 
-    .club-card-name {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 22px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
+        .profile-header h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 52px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-top: 12px;
+        }
 
-    .club-card-address {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12px;
-        color: var(--text-dim);
-        letter-spacing: 1px;
-        margin-bottom: 16px;
-    }
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .profile-card { background: var(--dark-2); border: 1px solid var(--border); padding: 32px; }
+        .profile-card-title { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 2px; color: var(--blue-light); margin-bottom: 24px; }
+        .profile-field { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .profile-field:last-of-type { border-bottom: none; }
+        .profile-field-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 1px; color: var(--text-dim); }
+        .profile-field-value { font-size: 14px; color: var(--text); }
+        .empty-bookings { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 2px; color: var(--text-dim); text-align: center; padding: 40px 0; }
 
-    .club-card-desc {
-        font-size: 14px;
-        color: var(--text-dim);
-        line-height: 1.7;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
+        /* =====================
+           МЕДИА ЗАПРОСЫ
+        ===================== */
+        @media (max-width: 768px) {
+            .club-header { grid-template-columns: 1fr; }
+            .zone-card-inner { grid-template-columns: 1fr; }
+            .zone-images img { height: 200px; }
+            .profile-grid { grid-template-columns: 1fr; }
+        }
 
-    .club-card-footer {
-        margin-top: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .club-card-zones {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
-        color: var(--blue-light);
-        letter-spacing: 1px;
-    }
-
-    .arrow {
-        color: var(--blue);
-        font-size: 20px;
-        transition: transform 0.2s;
-    }
-
-    .club-card:hover .arrow {
-        transform: translateX(6px);
-    }
-
-    /* Если клубов нет */
-    .empty-state {
-        text-align: center;
-        padding: 100px 20px;
-        color: var(--text-dim);
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 14px;
-        letter-spacing: 2px;
-    }
-    
-    .tariff-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    }
-
-    .tariff-hours {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 12px;
-        color: var(--text-dim);
-        letter-spacing: 1px;
-    }
-
-    .tariff-price {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 13px;
-        color: var(--blue-light);
-        letter-spacing: 1px;
-    }
-
-    .zone-gallery {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    max-width: 400px;
-    }
-
-    .zone-gallery img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        filter: brightness(0.8) saturate(0.8);
-        transition: filter 0.3s;
-    }
-
-    .zone-gallery img:first-child {
-        grid-column: 1 / -1;
-        height: 200px;
-    }
-
-    .zone-gallery img:hover {
-        filter: brightness(1) saturate(1);
-    }
     </style>
     {% block extra_css %}{% endblock %}
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
 
@@ -926,6 +711,22 @@
         <a href="{% url 'club:index' %}" class="logo">PC<span>.</span>CLUB</a>
         <nav>
             <a href="{% url 'club:index' %}">Клубы</a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'accounts:profile' %}"
+                   hx-get="{% url 'accounts:profile' %}"
+                   hx-target="#content"
+                   hx-push-url="true">
+                   {{ request.user.first_name }}</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}"
+                   hx-get="{% url 'accounts:login' %}"
+                   hx-target="#content"
+                   hx-push-url="true">Войти</a>
+                <a href="{% url 'accounts:register' %}"
+                   hx-get="{% url 'accounts:register' %}"
+                   hx-target="#content"
+                   hx-push-url="true">Регистрация</a>
+            {% endif %}
         </nav>
     </header>
 
@@ -933,7 +734,6 @@
         <div id="content">
             {% block content %}{% endblock %}
         </div>
-        
     </main>
 
     <footer>

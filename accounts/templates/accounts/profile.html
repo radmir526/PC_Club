@@ -1,0 +1,51 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Профиль — PC Club{% endblock %}
+
+{% block content %}
+<div class="profile-wrap">
+
+    <div class="profile-header">
+        <span class="label">// Личный кабинет</span>
+        <h1>{{ user.first_name }}</h1>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="profile-grid">
+
+        {# Данные пользователя #}
+        <div class="profile-card">
+            <div class="profile-card-title">// Мои данные</div>
+            <div class="profile-field">
+                <span class="profile-field-label">Имя</span>
+                <span class="profile-field-value">{{ user.first_name }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="profile-field-label">Телефон</span>
+                <span class="profile-field-value">{{ user.phone }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="profile-field-label">Дата регистрации</span>
+                <span class="profile-field-value">{{ user.date_joined|date:"d.m.Y" }}</span>
+            </div>
+
+            {# Кнопка выхода #}
+            <form method="post" action="{% url 'accounts:logout' %}" style="margin-top: 24px;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">Выйти →</button>
+            </form>
+        </div>
+
+        {# Брони — пока пусто, заполним когда сделаем bookings #}
+        <div class="profile-card">
+            <div class="profile-card-title">// Мои брони</div>
+            <div class="empty-bookings">
+                // БРОНЕЙ НЕТ
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

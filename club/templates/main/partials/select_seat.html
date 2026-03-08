@@ -55,27 +55,36 @@
         </div>
     </div>
 
-    {# Экран — просто декорация #}
-    <div class="screen">
-        <div class="screen-line"></div>
-        <div class="screen-label">МОНИТОРЫ</div>
-    </div>
+    <div class="seats-with-monitor">
 
-    {# Схема мест, сгруппированная по рядам #}
-    <div class="seats-layout">
-        {% regroup zone.seats.all by row as rows %}
-        {% for row in rows %}
-            <div class="seat-column">
-                <div class="row-label">R{{ row.grouper }}</div>
-                {% for seat in row.list %}
-                    {% if seat.is_active %}
-                        <a href="#" class="seat free">{{ seat.number }}</a>
-                    {% else %}
-                        <div class="seat inactive">{{ seat.number }}</div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endfor %}
-    </div>
+        <div class="monitor-side">
+            <div class="monitor-line"></div>
+            <div class="monitor-label">МОНИТОРЫ</div>
+            <div class="monitor-line"></div>
+        </div>
+
+        <div class="seats-layout">
+            {% regroup zone.seats.all by row as rows %}
+            {% for row in rows %}
+                <div class="seat-column">
+                    <div class="row-label">R{{ row.grouper }}</div>
+                    {% for seat in row.list %}
+                        {% if seat.is_active %}
+                            <a href="#" class="seat free">{{ seat.number }}</a>
+                        {% else %}
+                            <div class="seat inactive">{{ seat.number }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="monitor-side">
+            <div class="monitor-line"></div>
+            <div class="monitor-label">МОНИТОРЫ</div>
+            <div class="monitor-line"></div>
+        </div>
+
+</div>
 
 </div>
